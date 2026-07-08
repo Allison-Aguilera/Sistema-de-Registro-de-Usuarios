@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Registro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+    <div class="container d-flex justify-content-center align-items-center vh-100">
+        <div class="card p-4 shadow" style="width: 400px;">
+            <h2 class="text-center mb-4">Registro</h2>
+
+            {% with mensajes = get_flashed_messages(with_categories=true) %}
+            {% if mensajes %}
+            {% for categoria, mensaje in mensajes %}
+            <div class="alert alert-{{ categoria }}">{{ mensaje }}</div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('auth.registro') }}" onsubmit="return validarFormulario()">
+
+                <div class="mb-3">
+                    <label class="form-label">Nombre de usuario</label>
+                    <input type="text" name="nombre" id="nombre" class="form-control" placeholder="Nombre de usuario"
+                        required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Contraseña</label>
+                    <input type="password" name="password" id="password" class="form-control"
+                        oninput="validarPassword()" required>
+                    <div id="msg-password" class="form-text">Mínimo 8 caracteres, una mayúscula y un carácter especial.
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Confirmar Contraseña</label>
+                    <input type="password" name="confirm_password" id="confirm_password" class="form-control"
+                        oninput="validarConfirmacion()" required>
+                    <div id="msg-confirm" class="form-text"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Correo electrónico</label>
+                    <input type="email" name="correo" id="correo" class="form-control" placeholder="correo@ejemplo.com"
+                        oninput="validarCorreo()" required>
+                    <div id="msg-correo" class="form-text"></div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Registrarse</button>
+            </form>
+
+            <p class="text-center mt-3">¿Ya tienes cuenta? <a href="/">Inicia sesión</a></p>
+        </div>
+    </div>
+
+    <script>
+        const regexPassword = /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>_\-+=]).{8,}$/;
+
+        function marcarValido(input, esValido) {
+            if (esValido) {
+                input.classList.remove("is-invalid");
+                input.classList.add("is-valid");
+            } else {
+                input.classList.remove("is-valid");
+                input.classList.add("is-invalid");
+            }
+        }
+
+        function validarPassword() {
+            const password = document.getElementById("password").value;
+            const msg = document.getElementById("msg-password");
+            const input = document.getElementById("password");
+            const esValido = regexPassword.test(password);
+
+            marcarValido(input, esValido);
+            msg.textContent = esValido
+                ? "Contraseña válida."
+                : "Debe tener mínimo 8 caracteres, una mayúscula y un carácter especial.";
+            msg.className = esValido ? "form-text text-success" : "form-text text-danger";
+
+            validarConfirmacion();
+            return esValido;
+        }
+
+        function validarConfirmacion() {
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirm_password").value;
+            const msg = document.getElementById("msg-confirm");
+            const input = document.getElementById("confirm_password");
+
+            if (confirmPassword === "") {
+                msg.textContent = "";
+                input.classList.remove("is-valid", "is-invalid");
+                return false;
+            }
+
+            const esValido = password === confirmPassword;
+            marcarValido(input, esValido);
+            msg.textContent = esValido ? "Las contraseñas coinciden." : "Las contraseñas no coinciden.";
+            msg.className = esValido ? "form-text text-success" : "form-text text-danger";
+            return esValido;
+        }
+
+        function validarCorreo() {
+            const correo = document.getElementById("correo").value;
+            const msg = document.getElementById("msg-correo");
+            const input = document.getElementById("correo");
+            const esValido = correo.includes("@") && correo.length >= 15;
+
+            marcarValido(input, esValido);
+            msg.textContent = esValido
+                ? "Correo válido."
+                : "El correo debe contener un @ y tener mínimo 15 caracteres.";
+            msg.className = esValido ? "form-text text-success" : "form-text text-danger";
+            return esValido;
+        }
+        function validarFormulario() {
+            const passwordValida = validarPassword();
+            const confirmValida = validarConfirmacion();
+            const correoValido = validarCorreo();
+
+            return passwordValida && confirmValida && correoValido;
+        }
+    </script>
+</body>
+
+</html>
