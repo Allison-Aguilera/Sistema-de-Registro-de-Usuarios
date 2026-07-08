@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Perfil</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container d-flex justify-content-center align-items-center vh-100">
+        <div class="card p-4 shadow text-center" style="width: 350px;">
+
+            <form method="POST" action="{{ url_for('auth.perfil') }}" enctype="multipart/form-data" class="mt-3">
+
+                <div class="position-relative mx-auto mb-2" style="width: 120px; height: 120px;">
+                    <img id="preview-foto"
+                         src="{{ url_for('auth.foto_perfil') }}"
+                         class="rounded-circle"
+                         style="width: 120px; height: 120px; object-fit: cover; cursor: pointer;"
+                         onclick="document.getElementById('input-foto').click()"
+                         title="Haz clic para cambiar tu foto">
+
+                    <div onclick="document.getElementById('input-foto').click()"
+                         class="position-absolute d-flex align-items-center justify-content-center bg-primary rounded-circle"
+                         style="width: 32px; height: 32px; bottom: 0; right: 0; cursor: pointer; border: 2px solid white;">
+                        <span style="font-size: 16px;">📷</span>
+                    </div>
+                </div>
+
+                <input type="file" id="input-foto" name="foto" accept="image/*"
+                       style="display: none;" onchange="previsualizar(this)">
+
+                <div>
+                    <button type="submit" id="btn-guardar-foto" class="btn btn-primary btn-sm mt-2" style="display: none;">
+                        Guardar foto
+                    </button>
+                </div>
+
+            </form>
+
+            <h4 class="mt-3">{{ usuario.nombre }}</h4>
+            <p class="text-muted">{{ usuario.correo }}</p>
+
+            <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger btn-sm mt-2">Cerrar sesión</a>
+        </div>
+    </div>
+
+    <script>
+        function previsualizar(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById("preview-foto").src = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+
+                document.getElementById("btn-guardar-foto").style.display = "inline-block";
+            }
+        }
+    </script>
+</body>
+</html>
